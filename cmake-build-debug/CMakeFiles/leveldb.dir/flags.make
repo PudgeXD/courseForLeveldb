@@ -7,11 +7,11 @@ C_FLAGS = -g   -std=c11
 
 C_DEFINES = -DLEVELDB_COMPILE_LIBRARY -DLEVELDB_PLATFORM_POSIX=1
 
-C_INCLUDES = -I/home/rui/Git/courseForLeveldb/cmake-build-debug/include -I/home/rui/Git/courseForLeveldb -I/home/rui/Git/courseForLeveldb/include 
+C_INCLUDES = -I/home/honwee/CLionProjects/courseForLeveldb/cmake-build-debug/include -I/home/honwee/CLionProjects/courseForLeveldb -I/home/honwee/CLionProjects/courseForLeveldb/include 
 
 CXX_FLAGS = -g   -std=c++11
 
 CXX_DEFINES = -DLEVELDB_COMPILE_LIBRARY -DLEVELDB_PLATFORM_POSIX=1
 
-CXX_INCLUDES = -I/home/rui/Git/courseForLeveldb/cmake-build-debug/include -I/home/rui/Git/courseForLeveldb -I/home/rui/Git/courseForLeveldb/include 
+CXX_INCLUDES = -I/home/honwee/CLionProjects/courseForLeveldb/cmake-build-debug/include -I/home/honwee/CLionProjects/courseForLeveldb -I/home/honwee/CLionProjects/courseForLeveldb/include 
 

@@ -39,19 +39,19 @@ cmake_force:
 SHELL = /bin/sh
 
 # The CMake executable.
-CMAKE_COMMAND = /home/rui/software/clion/clion-2018.3.2/bin/cmake/linux/bin/cmake
+CMAKE_COMMAND = /home/honwee/Downloads/clion-2018.3.4/bin/cmake/linux/bin/cmake
 
 # The command to remove a file.
-RM = /home/rui/software/clion/clion-2018.3.2/bin/cmake/linux/bin/cmake -E remove -f
+RM = /home/honwee/Downloads/clion-2018.3.4/bin/cmake/linux/bin/cmake -E remove -f
 
 # Escaping for special characters.
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/rui/Git/courseForLeveldb
+CMAKE_SOURCE_DIR = /home/honwee/CLionProjects/courseForLeveldb
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/rui/Git/courseForLeveldb/cmake-build-debug
+CMAKE_BINARY_DIR = /home/honwee/CLionProjects/courseForLeveldb/cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -59,7 +59,7 @@ CMAKE_BINARY_DIR = /home/rui/Git/courseForLeveldb/cmake-build-debug
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/home/rui/software/clion/clion-2018.3.2/bin/cmake/linux/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/home/honwee/Downloads/clion-2018.3.4/bin/cmake/linux/bin/cmake -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : rebuild_cache
 
 # Special rule for the target rebuild_cache
@@ -70,7 +70,7 @@ rebuild_cache/fast: rebuild_cache
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/home/rui/software/clion/clion-2018.3.2/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	/home/honwee/Downloads/clion-2018.3.4/bin/cmake/linux/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/rui/Git/courseForLeveldb/cmake-build-debug/CMakeFiles /home/rui/Git/courseForLeveldb/cmake-build-debug/CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/honwee/CLionProjects/courseForLeveldb/cmake-build-debug/CMakeFiles /home/honwee/CLionProjects/courseForLeveldb/cmake-build-debug/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/rui/Git/courseForLeveldb/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/honwee/CLionProjects/courseForLeveldb/cmake-build-debug/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -109,6 +109,71 @@ preinstall/fast:
 depend:
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
+
+#=============================================================================
+# Target rules for targets named test_seek
+
+# Build rule for target.
+test_seek: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 test_seek
+.PHONY : test_seek
+
+# fast build rule for target.
+test_seek/fast:
+	$(MAKE) -f CMakeFiles/test_seek.dir/build.make CMakeFiles/test_seek.dir/build
+.PHONY : test_seek/fast
+
+#=============================================================================
+# Target rules for targets named db_index
+
+# Build rule for target.
+db_index: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 db_index
+.PHONY : db_index
+
+# fast build rule for target.
+db_index/fast:
+	$(MAKE) -f CMakeFiles/db_index.dir/build.make CMakeFiles/db_index.dir/build
+.PHONY : db_index/fast
+
+#=============================================================================
+# Target rules for targets named sst_test
+
+# Build rule for target.
+sst_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sst_test
+.PHONY : sst_test
+
+# fast build rule for target.
+sst_test/fast:
+	$(MAKE) -f CMakeFiles/sst_test.dir/build.make CMakeFiles/sst_test.dir/build
+.PHONY : sst_test/fast
+
+#=============================================================================
+# Target rules for targets named multimap_test
+
+# Build rule for target.
+multimap_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 multimap_test
+.PHONY : multimap_test
+
+# fast build rule for target.
+multimap_test/fast:
+	$(MAKE) -f CMakeFiles/multimap_test.dir/build.make CMakeFiles/multimap_test.dir/build
+.PHONY : multimap_test/fast
+
+#=============================================================================
+# Target rules for targets named mmap_test
+
+# Build rule for target.
+mmap_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 mmap_test
+.PHONY : mmap_test
+
+# fast build rule for target.
+mmap_test/fast:
+	$(MAKE) -f CMakeFiles/mmap_test.dir/build.make CMakeFiles/mmap_test.dir/build
+.PHONY : mmap_test/fast
 
 #=============================================================================
 # Target rules for targets named leveldbutil
@@ -647,6 +712,60 @@ helpers/memenv/memenv.cc.s:
 	$(MAKE) -f CMakeFiles/leveldb.dir/build.make CMakeFiles/leveldb.dir/helpers/memenv/memenv.cc.s
 .PHONY : helpers/memenv/memenv.cc.s
 
+index_test/multimap_test.o: index_test/multimap_test.cc.o
+
+.PHONY : index_test/multimap_test.o
+
+# target to build an object file
+index_test/multimap_test.cc.o:
+	$(MAKE) -f CMakeFiles/multimap_test.dir/build.make CMakeFiles/multimap_test.dir/index_test/multimap_test.cc.o
+.PHONY : index_test/multimap_test.cc.o
+
+index_test/multimap_test.i: index_test/multimap_test.cc.i
+
+.PHONY : index_test/multimap_test.i
+
+# target to preprocess a source file
+index_test/multimap_test.cc.i:
+	$(MAKE) -f CMakeFiles/multimap_test.dir/build.make CMakeFiles/multimap_test.dir/index_test/multimap_test.cc.i
+.PHONY : index_test/multimap_test.cc.i
+
+index_test/multimap_test.s: index_test/multimap_test.cc.s
+
+.PHONY : index_test/multimap_test.s
+
+# target to generate assembly for a file
+index_test/multimap_test.cc.s:
+	$(MAKE) -f CMakeFiles/multimap_test.dir/build.make CMakeFiles/multimap_test.dir/index_test/multimap_test.cc.s
+.PHONY : index_test/multimap_test.cc.s
+
+index_test/test_seek.o: index_test/test_seek.cc.o
+
+.PHONY : index_test/test_seek.o
+
+# target to build an object file
+index_test/test_seek.cc.o:
+	$(MAKE) -f CMakeFiles/test_seek.dir/build.make CMakeFiles/test_seek.dir/index_test/test_seek.cc.o
+.PHONY : index_test/test_seek.cc.o
+
+index_test/test_seek.i: index_test/test_seek.cc.i
+
+.PHONY : index_test/test_seek.i
+
+# target to preprocess a source file
+index_test/test_seek.cc.i:
+	$(MAKE) -f CMakeFiles/test_seek.dir/build.make CMakeFiles/test_seek.dir/index_test/test_seek.cc.i
+.PHONY : index_test/test_seek.cc.i
+
+index_test/test_seek.s: index_test/test_seek.cc.s
+
+.PHONY : index_test/test_seek.s
+
+# target to generate assembly for a file
+index_test/test_seek.cc.s:
+	$(MAKE) -f CMakeFiles/test_seek.dir/build.make CMakeFiles/test_seek.dir/index_test/test_seek.cc.s
+.PHONY : index_test/test_seek.cc.s
+
 table/block.o: table/block.cc.o
 
 .PHONY : table/block.o
@@ -917,6 +1036,36 @@ test/db_WriteBatch.cc.s:
 	$(MAKE) -f CMakeFiles/db_WriteBatch.dir/build.make CMakeFiles/db_WriteBatch.dir/test/db_WriteBatch.cc.s
 .PHONY : test/db_WriteBatch.cc.s
 
+test/db_index.o: test/db_index.cc.o
+
+.PHONY : test/db_index.o
+
+# target to build an object file
+test/db_index.cc.o:
+	$(MAKE) -f CMakeFiles/db_index.dir/build.make CMakeFiles/db_index.dir/test/db_index.cc.o
+	$(MAKE) -f CMakeFiles/db_snapshot.dir/build.make CMakeFiles/db_snapshot.dir/test/db_index.cc.o
+.PHONY : test/db_index.cc.o
+
+test/db_index.i: test/db_index.cc.i
+
+.PHONY : test/db_index.i
+
+# target to preprocess a source file
+test/db_index.cc.i:
+	$(MAKE) -f CMakeFiles/db_index.dir/build.make CMakeFiles/db_index.dir/test/db_index.cc.i
+	$(MAKE) -f CMakeFiles/db_snapshot.dir/build.make CMakeFiles/db_snapshot.dir/test/db_index.cc.i
+.PHONY : test/db_index.cc.i
+
+test/db_index.s: test/db_index.cc.s
+
+.PHONY : test/db_index.s
+
+# target to generate assembly for a file
+test/db_index.cc.s:
+	$(MAKE) -f CMakeFiles/db_index.dir/build.make CMakeFiles/db_index.dir/test/db_index.cc.s
+	$(MAKE) -f CMakeFiles/db_snapshot.dir/build.make CMakeFiles/db_snapshot.dir/test/db_index.cc.s
+.PHONY : test/db_index.cc.s
+
 test/db_snapshot.o: test/db_snapshot.cc.o
 
 .PHONY : test/db_snapshot.o
@@ -970,6 +1119,60 @@ test/db_test.s: test/db_test.cc.s
 test/db_test.cc.s:
 	$(MAKE) -f CMakeFiles/db_test.dir/build.make CMakeFiles/db_test.dir/test/db_test.cc.s
 .PHONY : test/db_test.cc.s
+
+test/mmap_test.o: test/mmap_test.cc.o
+
+.PHONY : test/mmap_test.o
+
+# target to build an object file
+test/mmap_test.cc.o:
+	$(MAKE) -f CMakeFiles/mmap_test.dir/build.make CMakeFiles/mmap_test.dir/test/mmap_test.cc.o
+.PHONY : test/mmap_test.cc.o
+
+test/mmap_test.i: test/mmap_test.cc.i
+
+.PHONY : test/mmap_test.i
+
+# target to preprocess a source file
+test/mmap_test.cc.i:
+	$(MAKE) -f CMakeFiles/mmap_test.dir/build.make CMakeFiles/mmap_test.dir/test/mmap_test.cc.i
+.PHONY : test/mmap_test.cc.i
+
+test/mmap_test.s: test/mmap_test.cc.s
+
+.PHONY : test/mmap_test.s
+
+# target to generate assembly for a file
+test/mmap_test.cc.s:
+	$(MAKE) -f CMakeFiles/mmap_test.dir/build.make CMakeFiles/mmap_test.dir/test/mmap_test.cc.s
+.PHONY : test/mmap_test.cc.s
+
+test/sst_test.o: test/sst_test.cpp.o
+
+.PHONY : test/sst_test.o
+
+# target to build an object file
+test/sst_test.cpp.o:
+	$(MAKE) -f CMakeFiles/sst_test.dir/build.make CMakeFiles/sst_test.dir/test/sst_test.cpp.o
+.PHONY : test/sst_test.cpp.o
+
+test/sst_test.i: test/sst_test.cpp.i
+
+.PHONY : test/sst_test.i
+
+# target to preprocess a source file
+test/sst_test.cpp.i:
+	$(MAKE) -f CMakeFiles/sst_test.dir/build.make CMakeFiles/sst_test.dir/test/sst_test.cpp.i
+.PHONY : test/sst_test.cpp.i
+
+test/sst_test.s: test/sst_test.cpp.s
+
+.PHONY : test/sst_test.s
+
+# target to generate assembly for a file
+test/sst_test.cpp.s:
+	$(MAKE) -f CMakeFiles/sst_test.dir/build.make CMakeFiles/sst_test.dir/test/sst_test.cpp.s
+.PHONY : test/sst_test.cpp.s
 
 util/arena.o: util/arena.cc.o
 
@@ -1409,7 +1612,12 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... test_seek"
 	@echo "... rebuild_cache"
+	@echo "... db_index"
+	@echo "... sst_test"
+	@echo "... multimap_test"
+	@echo "... mmap_test"
 	@echo "... leveldbutil"
 	@echo "... leveldb"
 	@echo "... db_test"
@@ -1468,6 +1676,12 @@ help:
 	@echo "... helpers/memenv/memenv.o"
 	@echo "... helpers/memenv/memenv.i"
 	@echo "... helpers/memenv/memenv.s"
+	@echo "... index_test/multimap_test.o"
+	@echo "... index_test/multimap_test.i"
+	@echo "... index_test/multimap_test.s"
+	@echo "... index_test/test_seek.o"
+	@echo "... index_test/test_seek.i"
+	@echo "... index_test/test_seek.s"
 	@echo "... table/block.o"
 	@echo "... table/block.i"
 	@echo "... table/block.s"
@@ -1498,12 +1712,21 @@ help:
 	@echo "... test/db_WriteBatch.o"
 	@echo "... test/db_WriteBatch.i"
 	@echo "... test/db_WriteBatch.s"
+	@echo "... test/db_index.o"
+	@echo "... test/db_index.i"
+	@echo "... test/db_index.s"
 	@echo "... test/db_snapshot.o"
 	@echo "... test/db_snapshot.i"
 	@echo "... test/db_snapshot.s"
 	@echo "... test/db_test.o"
 	@echo "... test/db_test.i"
 	@echo "... test/db_test.s"
+	@echo "... test/mmap_test.o"
+	@echo "... test/mmap_test.i"
+	@echo "... test/mmap_test.s"
+	@echo "... test/sst_test.o"
+	@echo "... test/sst_test.i"
+	@echo "... test/sst_test.s"
 	@echo "... util/arena.o"
 	@echo "... util/arena.i"
 	@echo "... util/arena.s"
