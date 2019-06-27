@@ -15,7 +15,7 @@ int main() {
   leveldb::DB* db;
   leveldb::Options options;
   options.create_if_missing = true;
-  leveldb::Status status = leveldb::DB::Open(options, "testdb", &db);
+  leveldb::Status status = leveldb::DB::Open(options, "/home/honwee/CLionProjects/courseForLeveldb/test/mydb", &db);
   assert(status.ok());
   for(int i = 0; i < 100;i++ ){
     std::string key1="key" + i;

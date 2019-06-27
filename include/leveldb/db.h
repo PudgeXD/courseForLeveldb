@@ -8,7 +8,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <vector>
-#include <db/version_set.h>
 #include "leveldb/export.h"
 #include "leveldb/iterator.h"
 #include "leveldb/options.h"
@@ -23,6 +22,7 @@ struct Options;
 struct ReadOptions;
 struct WriteOptions;
 class WriteBatch;
+class Version;
 
 // Abstract handle to particular state of a DB.
 // A Snapshot is an immutable object and can therefore be safely
