@@ -10,4 +10,5 @@
 /home/honwee/CLionProjects/courseForLeveldb/cmake-build-debug/CMakeFiles/index_test.dir
 /home/honwee/CLionProjects/courseForLeveldb/cmake-build-debug/CMakeFiles/edit_cache.dir
 /home/honwee/CLionProjects/courseForLeveldb/cmake-build-debug/CMakeFiles/db_WriteBatch.dir
+/home/honwee/CLionProjects/courseForLeveldb/cmake-build-debug/CMakeFiles/self_join.dir
 /home/honwee/CLionProjects/courseForLeveldb/cmake-build-debug/CMakeFiles/db_snapshot.dir

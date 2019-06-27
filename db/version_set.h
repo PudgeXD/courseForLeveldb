@@ -57,7 +57,7 @@ bool SomeFileOverlapsRange(const InternalKeyComparator& icmp,
 
 class Version {
  public:
-  // Append to *iters a sequence of iterators that will
+    // Append to *iters a sequence of iterators that will
   // yield the contents of this Version when merged together.
   // REQUIRES: This version has been saved (see VersionSet::SaveTo)
   void AddIterators(const ReadOptions&, std::vector<Iterator*>* iters);
@@ -69,6 +69,10 @@ class Version {
     FileMetaData* seek_file;
     int seek_file_level;
   };
+
+  std::vector<FileMetaData *>  GetFiles(int level) {
+    return files_[level];
+  }
   Status Get(const ReadOptions&, const LookupKey& key, std::string* val,
              GetStats* stats);
 

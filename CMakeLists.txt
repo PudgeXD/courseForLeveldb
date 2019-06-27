@@ -286,3 +286,8 @@ add_executable(test_seek
         "${PROJECT_SOURCE_DIR}/index_test/test_seek.cc"
         )
 target_link_libraries(test_seek leveldb)
+
+add_executable(self_join
+        "${PROJECT_SOURCE_DIR}/test/self_join.cc"
+        )
+target_link_libraries(self_join leveldb)

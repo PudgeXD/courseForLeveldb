@@ -241,6 +241,19 @@ db_WriteBatch/fast:
 .PHONY : db_WriteBatch/fast
 
 #=============================================================================
+# Target rules for targets named self_join
+
+# Build rule for target.
+self_join: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 self_join
+.PHONY : self_join
+
+# fast build rule for target.
+self_join/fast:
+	$(MAKE) -f CMakeFiles/self_join.dir/build.make CMakeFiles/self_join.dir/build
+.PHONY : self_join/fast
+
+#=============================================================================
 # Target rules for targets named db_snapshot
 
 # Build rule for target.
@@ -1147,6 +1160,33 @@ test/mmap_test.cc.s:
 	$(MAKE) -f CMakeFiles/mmap_test.dir/build.make CMakeFiles/mmap_test.dir/test/mmap_test.cc.s
 .PHONY : test/mmap_test.cc.s
 
+test/self_join.o: test/self_join.cc.o
+
+.PHONY : test/self_join.o
+
+# target to build an object file
+test/self_join.cc.o:
+	$(MAKE) -f CMakeFiles/self_join.dir/build.make CMakeFiles/self_join.dir/test/self_join.cc.o
+.PHONY : test/self_join.cc.o
+
+test/self_join.i: test/self_join.cc.i
+
+.PHONY : test/self_join.i
+
+# target to preprocess a source file
+test/self_join.cc.i:
+	$(MAKE) -f CMakeFiles/self_join.dir/build.make CMakeFiles/self_join.dir/test/self_join.cc.i
+.PHONY : test/self_join.cc.i
+
+test/self_join.s: test/self_join.cc.s
+
+.PHONY : test/self_join.s
+
+# target to generate assembly for a file
+test/self_join.cc.s:
+	$(MAKE) -f CMakeFiles/self_join.dir/build.make CMakeFiles/self_join.dir/test/self_join.cc.s
+.PHONY : test/self_join.cc.s
+
 test/sst_test.o: test/sst_test.cpp.o
 
 .PHONY : test/sst_test.o
@@ -1624,6 +1664,7 @@ help:
 	@echo "... index_test"
 	@echo "... edit_cache"
 	@echo "... db_WriteBatch"
+	@echo "... self_join"
 	@echo "... db_snapshot"
 	@echo "... db/builder.o"
 	@echo "... db/builder.i"
@@ -1724,6 +1765,9 @@ help:
 	@echo "... test/mmap_test.o"
 	@echo "... test/mmap_test.i"
 	@echo "... test/mmap_test.s"
+	@echo "... test/self_join.o"
+	@echo "... test/self_join.i"
+	@echo "... test/self_join.s"
 	@echo "... test/sst_test.o"
 	@echo "... test/sst_test.i"
 	@echo "... test/sst_test.s"

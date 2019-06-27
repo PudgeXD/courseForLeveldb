@@ -39,6 +39,13 @@ namespace leveldb {
 
 const int kNumNonTableCacheFiles = 10;
 
+Version* DBImpl::GetCurrentVersion(){
+    return versions_->current();
+}
+
+Version* DB::GetCurrentVersion(){
+    return GetCurrentVersion();
+}
 // Information kept for every waiting writer
 struct DBImpl::Writer {
   Status status;

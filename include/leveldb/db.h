@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <vector>
+#include <db/version_set.h>
 #include "leveldb/export.h"
 #include "leveldb/iterator.h"
 #include "leveldb/options.h"
@@ -54,6 +55,7 @@ class LEVELDB_EXPORT DB {
                      const std::string& name,
                      DB** dbptr);
 
+
   DB() = default;
 
   DB(const DB&) = delete;
@@ -67,6 +69,8 @@ class LEVELDB_EXPORT DB {
   virtual Status Put(const WriteOptions& options,
                      const Slice& key,
                      const Slice& value) = 0;
+
+  virtual Version* GetCurrentVersion();
 
   // Remove the database entry (if any) for "key".  Returns OK on
   // success, and a non-OK status on error.  It is not an error if "key"
