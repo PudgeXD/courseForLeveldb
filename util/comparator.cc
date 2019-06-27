@@ -66,10 +66,58 @@ class BytewiseComparatorImpl : public Comparator {
     // *key is a run of 0xffs.  Leave it alone.
   }
 };
+
+class NumComparatorImpl : public Comparator {
+public:
+    NumComparatorImpl() { }
+
+    virtual const char* Name() const {
+      return "diy.NumComparator";
+    }
+
+    virtual int Compare(const Slice& a, const Slice& b) const {
+        int int_a = atoi(a.data());
+        int int_b = atoi(b.data());
+        return int_a-int_b;
+    }
+
+    virtual void FindShortestSeparator(
+            std::string* start,
+            const Slice& limit) const {
+        int int_start = atoi(start->c_str());
+        int int_limit = atoi(limit.data());
+        int sep = int_start+1;
+        if(int_limit>sep)
+        {
+            *start = std::to_string(sep);
+        }
+    }
+
+    virtual void FindShortSuccessor(std::string* key) const {
+      // Find first character that can be incremented
+      int int_key = atoi(key->c_str());
+      *key = std::to_string(int_key+1);
+
+      size_t n = key->size();
+      for (size_t i = 0; i < n; i++) {
+        const uint8_t byte = (*key)[i];
+        if (byte != static_cast<uint8_t>(0xff)) {
+          (*key)[i] = byte + 1;
+          key->resize(i+1);
+          return;
+        }
+      }
+    }
+};
 }  // namespace
 
 const Comparator* BytewiseComparator() {
   static NoDestructor<BytewiseComparatorImpl> singleton;
+  return singleton.get();
+}
+
+const Comparator* NumComparator() {
+  static NoDestructor<NumComparatorImpl> singleton;
   return singleton.get();
 }
 

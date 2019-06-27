@@ -291,3 +291,4 @@ add_executable(self_join
         "${PROJECT_SOURCE_DIR}/test/self_join.cc"
         )
 target_link_libraries(self_join leveldb)
+

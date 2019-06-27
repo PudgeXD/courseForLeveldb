@@ -59,7 +59,7 @@ class LEVELDB_EXPORT Comparator {
 // must not be deleted.
 LEVELDB_EXPORT const Comparator* BytewiseComparator();
 
-//LEVELDB_EXPORT const Comparator* NumComparator();
+LEVELDB_EXPORT const Comparator* NumComparator();
 
 }  // namespace leveldb
 
