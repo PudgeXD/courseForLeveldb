@@ -35,6 +35,20 @@ struct Table::Rep {
   Block* index_block;
 };
 
+bool Table::KeyMayMatch(Slice key)
+{
+  Iterator* iiter = rep_->index_block->NewIterator(rep_->options.comparator);
+  iiter->Seek(key);
+  if (iiter->Valid()) {
+    Slice handle_value = iiter->value();
+    FilterBlockReader *filter = rep_->filter;
+    BlockHandle handle;
+    return filter->KeyMayMatch(handle.offset(), key);
+  }
+  else
+    return false;
+}
+
 Status Table::Open(const Options& options,
                    RandomAccessFile* file,
                    uint64_t size,

@@ -107,7 +107,7 @@ void TableBuilder::Add(const Slice& key, const Slice& value) {
   }
 
   if (r->filter_block != nullptr) {
-    r->filter_block->AddKey(key);
+    r->filter_block->AddKey(value);
   }
 
   r->last_key.assign(key.data(), key.size());
@@ -116,7 +116,7 @@ void TableBuilder::Add(const Slice& key, const Slice& value) {
 
   const size_t estimated_block_size = r->data_block.CurrentSizeEstimate();
   if (estimated_block_size >= r->options.block_size) {
-    Flush();
+    Flush(); // pending_index_entry = true
   }
 }
 

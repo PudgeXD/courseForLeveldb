@@ -46,6 +46,12 @@ Version* DBImpl::GetCurrentVersion(){
 Version* DB::GetCurrentVersion(){
     return GetCurrentVersion();
 }
+SequenceNumber DBImpl::GetLastSequenceNumber(){
+  return versions_->LastSequence();
+}
+SequenceNumber DB::GetLastSequenceNumber(){
+    return GetLastSequenceNumber();
+}
 // Information kept for every waiting writer
 struct DBImpl::Writer {
   Status status;

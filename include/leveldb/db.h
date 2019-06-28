@@ -23,6 +23,7 @@ struct ReadOptions;
 struct WriteOptions;
 class WriteBatch;
 class Version;
+typedef uint64_t SequenceNumber;
 
 // Abstract handle to particular state of a DB.
 // A Snapshot is an immutable object and can therefore be safely
@@ -71,6 +72,7 @@ class LEVELDB_EXPORT DB {
                      const Slice& value) = 0;
 
   virtual Version* GetCurrentVersion();
+  virtual SequenceNumber GetLastSequenceNumber();
 
   // Remove the database entry (if any) for "key".  Returns OK on
   // success, and a non-OK status on error.  It is not an error if "key"

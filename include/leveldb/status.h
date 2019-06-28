@@ -54,6 +54,12 @@ class LEVELDB_EXPORT Status {
   static Status InvalidIdRange(const Slice& msg, const Slice& msg2 = Slice()) {
       return Status(kInvalidIdRange, msg, msg2);
   }
+  static Status NoTableHit(const Slice& msg, const Slice& msg2 = Slice()) {
+    return Status(kInvalidIdRange, msg, msg2);
+  }
+  static Status EmptyInput(const Slice& msg, const Slice& msg2 = Slice()) {
+    return Status(kEmptyInput, msg, msg2);
+  }
 
   // Returns true iff the status indicates success.
   bool ok() const { return (state_ == nullptr); }
@@ -75,6 +81,10 @@ class LEVELDB_EXPORT Status {
 
   bool IsInvalidIdRange() const {return code() == kInvalidIdRange;}
 
+  bool IsNoTableHit() const {return code() == kNoTableHit;}
+
+  bool IsEmptyInput() const {return code() == kEmptyInput;}
+
   // Return a string representation of this status suitable for printing.
   // Returns the string "OK" for success.
   std::string ToString() const;
@@ -94,7 +104,9 @@ class LEVELDB_EXPORT Status {
     kNotSupported = 3,
     kInvalidArgument = 4,
     kIOError = 5,
-    kInvalidIdRange = 6
+    kInvalidIdRange = 6,
+    kNoTableHit = 7,
+    kEmptyInput = 8
   };
 
   Code code() const {
