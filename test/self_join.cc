@@ -140,10 +140,11 @@ leveldb::Status TableFilter(
                     assert(status.ok());
                     status = leveldb::Table::Open(options, file, f->file_size, &table);
                     assert(status.ok());
+                    //FIXME:email过滤没起作用
                     //需要构造成internal_key
-                    for(int j=0;j<emails_lk.size();j++)
+                    for(auto lk:emails_lk)
                     {
-                        if(table->KeyMayMatch(emails_lk[j]->internal_key()))
+                        if(table->KeyMayMatch(lk->internal_key()))
                         {
                             FileMetaDatas.push_back(f);
                             continue;
@@ -178,23 +179,38 @@ leveldb::Status EntryFilter(std::string &db_name,
         assert(status.ok());
         status = leveldb::Table::Open(options, file, target_file->file_size, &table);
         assert(status.ok());
-        //TODO:二分查找indexBlock来确定Table的读取范围
         //读取符合条件的entry压入mmp
         //Warning:注意判断key已删除和重复的情况
         leveldb::Iterator *table_iter = table->NewIterator(leveldb::ReadOptions());
+        //TODO:确定起点和终点而不是全部遍历
+        //TODO:没考虑历史数据的情况
+//        int min_id = atoi(target_file->smallest.user_key().ToString().c_str());
+//        int max_id = atoi(target_file->largest.user_key().ToString().c_str());
+//        if(min_id<lower) {
+//            //起点为lower
+//        }else {
+//            //起点为min_id
+//        }
+//        if(max_id>upper) {
+//            //终点为upper
+//        } else {
+//            //终点为max_id
+//        }
         table_iter->SeekToFirst();
         while (table_iter->Valid()) {
             leveldb::ParsedInternalKey ikey;
             leveldb::ParseInternalKey(table_iter->key(), &ikey);
-            std::string key = ikey.user_key.ToString();
-            std::string value = table_iter->value().ToString();
-            int key_int = std::atoi(key.c_str());
-            if(key_int>=lower&&key_int<=upper)
-            {
-                for(auto email_lky:emails)
+            if(ikey.type!=leveldb::kTypeDeletion){
+                std::string key = ikey.user_key.ToString();
+                std::string value = table_iter->value().ToString();
+                int key_int = std::atoi(key.c_str());
+                if(key_int>=lower&&key_int<=upper)
                 {
-                    if(value.compare(email_lky->user_key().ToString())==0)
-                        mmap.insert(std::make_pair(value,key));
+                    for(auto email_lky:emails)
+                    {
+                        if(value.compare(email_lky->user_key().ToString())==0)
+                            mmap.insert(std::make_pair(value,key));
+                    }
                 }
             }
             table_iter->Next();
