@@ -76,8 +76,8 @@ public:
     }
 
     virtual int Compare(const Slice& a, const Slice& b) const {
-        int int_a = atoi(a.data());
-        int int_b = atoi(b.data());
+        int int_a = atoi(a.ToString().c_str());
+        int int_b = atoi(b.ToString().c_str());
         return int_a-int_b;
     }
 
@@ -85,7 +85,7 @@ public:
             std::string* start,
             const Slice& limit) const {
         int int_start = atoi(start->c_str());
-        int int_limit = atoi(limit.data());
+        int int_limit = atoi(limit.ToString().c_str());
         int sep = int_start+1;
         if(int_limit>sep)
         {
