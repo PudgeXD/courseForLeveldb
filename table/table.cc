@@ -37,19 +37,8 @@ struct Table::Rep {
 
 bool Table::KeyMayMatch(Slice key)
 {
-  //FIXME:index_block存的是key，metaBlock过滤器的是value，不能按原代码来
-  Iterator* iiter = rep_->index_block->NewIterator(rep_->options.comparator);
-  iiter->Seek(key);
-  if (iiter->Valid()) {
-    Slice handle_value = iiter->value();
-    FilterBlockReader *filter = rep_->filter;
-    BlockHandle handle;
-    
-    return (handle.DecodeFrom(&handle_value).ok() &&
-        !filter->KeyMayMatch(handle.offset(),key));
-  }
-  else
-    return false;
+  FilterBlockReader* filter = rep_->filter;
+  return filter->TraversalKeyMayMatch(key);
 }
 
 Status Table::Open(const Options& options,

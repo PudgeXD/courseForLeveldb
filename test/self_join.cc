@@ -140,7 +140,6 @@ leveldb::Status TableFilter(
                     assert(status.ok());
                     status = leveldb::Table::Open(options, file, f->file_size, &table);
                     assert(status.ok());
-                    //FIXME:email过滤没起作用
                     //需要构造成internal_key
                     for(auto lk:emails_lk)
                     {
@@ -224,7 +223,7 @@ int main()
     timeval start, end;
     std::string db_name = "/home/honwee/CLionProjects/courseForLeveldb/test/mydb";
     std::string data_file = "/home/honwee/CLionProjects/courseForLeveldb/test/data/TestData50w.csv";
-    leveldb::Status s = LoadData(db_name, data_file);
+//    leveldb::Status s = LoadData(db_name, data_file);
 
     leveldb::DB *db;
     leveldb::Options options;
@@ -236,8 +235,8 @@ int main()
     assert(status.ok());
 //    PrintTablesRange(db);
 
-    int lower = 1;
-    int upper = 500000;
+    int lower = 4;
+    int upper = 30000;
     std::vector<std::string> emails;
     emails.emplace_back("XZS@ecnu.cn");
     std::vector<leveldb::LookupKey*> emails_lkey;
@@ -246,7 +245,7 @@ int main()
     assert(status.ok());
 
     std::vector<leveldb::FileMetaData*> fileMetaDatas;
-//    gettimeofday(&start, nullptr);
+    gettimeofday(&start, nullptr);
     status = TableFilter(db,db_name,options,lower,upper,emails_lkey,fileMetaDatas);
     assert(status.ok());
     std::cout << "table hit:" << fileMetaDatas.size() << std::endl;
@@ -254,7 +253,7 @@ int main()
     std::multimap<std::string,std::string> mmap;
     status = EntryFilter(db_name,options,lower,upper,emails_lkey,fileMetaDatas,mmap);
     assert(status.ok());
-//    gettimeofday(&end, nullptr);
+    gettimeofday(&end, nullptr);
 
     std::string email = "XZS@ecnu.cn";
     std::multimap<std::string, std::string>::iterator it = mmap.find(email);
@@ -266,7 +265,7 @@ int main()
         }
     }
 
-//    std::cout<<end.tv_sec-start.tv_sec<<"s,"<<end.tv_usec-start.tv_usec<<"us"<<std::endl;
+    std::cout<<"time total:" << end.tv_sec-start.tv_sec<<"s,"<<end.tv_usec-start.tv_usec<<"us"<<std::endl;
 
     for(auto email_p : emails_lkey)
         delete email_p;
