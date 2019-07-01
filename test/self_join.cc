@@ -106,6 +106,7 @@ leveldb::Status PrintTablesRange(leveldb::DB *db)
         }
     }
 }
+
 leveldb::Status GetLookupKey(std::set<std::string>input,
                                 std::vector<leveldb::LookupKey*>&result,
                                 leveldb::SequenceNumber number)
@@ -171,7 +172,83 @@ leveldb::Status TableFilter(
     }
     return leveldb::Status::OK();
 }
+// 扫描表时会先找起点和终点
+leveldb::Status EntryFilter(std::string &db_name,
+                            leveldb::Options options,
+                            int lower, int upper,
+                            leveldb::SequenceNumber snapshot,
+                            std::vector<leveldb::LookupKey*>emails,
+                            std::vector<leveldb::FileMetaData*>fileMetaDatas,
+                            std::multimap<std::string,std::string> &mmap)
+{
+    if(fileMetaDatas.empty())
+    {
+        std::string range = std::to_string(lower)+"-"+std::to_string(upper);
+        return leveldb::Status::NoTableHit(range);
+    }
+    for(auto target_file:fileMetaDatas)
+    {
+        leveldb::Status status;
+        leveldb::RandomAccessFile *file = nullptr;
+        leveldb::Table *table;
+        status = options.env->NewRandomAccessFile(leveldb::TableFileName(db_name, target_file->number), &file);
+        assert(status.ok());
+        status = leveldb::Table::Open(options, file, target_file->file_size, &table);
+        assert(status.ok());
+        //读取符合条件的entry压入mmp
+        //Warning:注意判断key已删除和重复的情况
+        leveldb::Iterator *iter_start = table->NewIterator(leveldb::ReadOptions());
+        leveldb::Iterator *iter_end = table->NewIterator(leveldb::ReadOptions());
+        //TODO:确定起点和终点而不是全部遍历
+        //TODO:没考虑历史数据的情况
+        int min_id = atoi(target_file->smallest.user_key().ToString().c_str());
+        int max_id = atoi(target_file->largest.user_key().ToString().c_str());
+        int start, end;
+        if(min_id<lower) {
+            start = lower;
+        }else {
+            start = min_id;
+        }
+        if(max_id>upper) {
+            end = upper;
+        } else {
+            end = max_id;
+        }
 
+        leveldb::LookupKey* lky_start = new leveldb::LookupKey(std::to_string(start), snapshot);
+        leveldb::LookupKey* lky_end = new leveldb::LookupKey(std::to_string(end), snapshot);
+        iter_start->Seek(lky_start->internal_key());
+        iter_end->Seek(lky_end->internal_key());
+        bool stop = false;
+        while (iter_start->Valid() && iter_end->Valid()) {
+            leveldb::ParsedInternalKey ikey;
+            leveldb::ParseInternalKey(iter_start->key(), &ikey);
+            if(ikey.type!=leveldb::kTypeDeletion){
+                std::string key = ikey.user_key.ToString();
+                std::string value = iter_start->value().ToString();
+                int key_int = std::atoi(key.c_str());
+                if(key_int>=lower&&key_int<=upper)
+                {
+                    for(auto email_lky:emails)
+                    {
+                        if(value.compare(email_lky->user_key().ToString())==0)
+                            mmap.insert(std::make_pair(value,key));
+                    }
+                }
+            }
+            iter_start->Next();
+            if(stop)
+                break;
+            if(iter_start==iter_end)
+                stop = true;
+        }
+        delete lky_start;
+        delete lky_end;
+    }
+    return leveldb::Status::OK();
+}
+
+// 扫描表时会扫描所有的entry
 leveldb::Status EntryFilter(std::string &db_name,
                         leveldb::Options options,
                         int lower, int upper,
@@ -196,20 +273,6 @@ leveldb::Status EntryFilter(std::string &db_name,
         //读取符合条件的entry压入mmp
         //Warning:注意判断key已删除和重复的情况
         leveldb::Iterator *table_iter = table->NewIterator(leveldb::ReadOptions());
-        //TODO:确定起点和终点而不是全部遍历
-        //TODO:没考虑历史数据的情况
-//        int min_id = atoi(target_file->smallest.user_key().ToString().c_str());
-//        int max_id = atoi(target_file->largest.user_key().ToString().c_str());
-//        if(min_id<lower) {
-//            //起点为lower
-//        }else {
-//            //起点为min_id
-//        }
-//        if(max_id>upper) {
-//            //终点为upper
-//        } else {
-//            //终点为max_id
-//        }
         table_iter->SeekToFirst();
         while (table_iter->Valid()) {
             leveldb::ParsedInternalKey ikey;
@@ -268,7 +331,7 @@ int main()
     std::cout << "table hit:" << fileMetaDatas.size() << std::endl;
 
     std::multimap<std::string,std::string> mmap;
-    status = EntryFilter(db_name,options,lower,upper,emails_lkey,fileMetaDatas,mmap);
+    status = EntryFilter(db_name,options,lower,upper, snapshot,emails_lkey,fileMetaDatas,mmap);
     assert(status.ok());
     gettimeofday(&end, nullptr);
     std::cout<<"time total:" << end.tv_sec-start.tv_sec<<"s,"<<end.tv_usec-start.tv_usec<<"us"<<std::endl;
