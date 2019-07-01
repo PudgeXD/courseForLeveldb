@@ -3,6 +3,7 @@
 //#include <format.h>
 #include <iostream>
 #include <string>
+#include <set>
 #include <stdio.h>
 #include <sys/stat.h>
 #include <stdlib.h>
@@ -40,6 +41,21 @@ bool Intersect(int min1, int max1, int min2, int max2)
     return (min1>=min2 && min1<=max2) || (max1>=min2 && max1<=max2) || (min1<=min2 && max1>=max2);
 }
 
+void SplitString(const std::string& s, std::set<std::string>& mails, const std::string& sep=",")
+{
+    std::string::size_type pos1, pos2;
+    pos2 = s.find(sep);
+    pos1 = 0;
+    while(std::string::npos != pos2)
+    {
+        mails.insert(s.substr(pos1, pos2-pos1));
+
+        pos1 = pos2 + mails.size();
+        pos2 = s.find(sep, pos1);
+    }
+    if(pos1 != s.length())
+        mails.insert(s.substr(pos1));
+}
 
 leveldb::Status LoadData(std::string db_name, std::string file_name)
 {
@@ -90,15 +106,15 @@ leveldb::Status PrintTablesRange(leveldb::DB *db)
         }
     }
 }
-leveldb::Status GetLookupKey(std::vector<std::string>input,
+leveldb::Status GetLookupKey(std::set<std::string>input,
                                 std::vector<leveldb::LookupKey*>&result,
                                 leveldb::SequenceNumber number)
 {
     if(input.empty())
         return leveldb::Status::EmptyInput("");
-    for(int i=0;i<input.size();i++)
+    for(auto mail:input)
     {
-        leveldb::LookupKey* lky_p = new leveldb::LookupKey(input[i], number);
+        leveldb::LookupKey* lky_p = new leveldb::LookupKey(mail, number);
         result.emplace_back(lky_p);
     }
     return leveldb::Status::OK();
@@ -145,10 +161,9 @@ leveldb::Status TableFilter(
                     {
                         if(table->KeyMayMatch(lk->internal_key()))
                         {
-                            FileMetaDatas.push_back(f);
-                            continue;
+                            FileMetaDatas.emplace_back(f);
+                            break;
                         }
-
                     }
                 }
             }
@@ -235,10 +250,12 @@ int main()
     assert(status.ok());
 //    PrintTablesRange(db);
 
-    int lower = 4;
-    int upper = 30000;
-    std::vector<std::string> emails;
-    emails.emplace_back("XZS@ecnu.cn");
+    int lower = 1;
+    int upper = 500000;
+    std::string mails_str = "XZS@ecnu.cn,MVN@ecnu.cn";
+    //用set去重
+    std::set<std::string> emails;
+    SplitString(mails_str,emails,",");
     std::vector<leveldb::LookupKey*> emails_lkey;
     leveldb::SequenceNumber snapshot = db->GetLastSequenceNumber();
     status = GetLookupKey(emails, emails_lkey, snapshot);
@@ -254,18 +271,20 @@ int main()
     status = EntryFilter(db_name,options,lower,upper,emails_lkey,fileMetaDatas,mmap);
     assert(status.ok());
     gettimeofday(&end, nullptr);
+    std::cout<<"time total:" << end.tv_sec-start.tv_sec<<"s,"<<end.tv_usec-start.tv_usec<<"us"<<std::endl;
 
-    std::string email = "XZS@ecnu.cn";
-    std::multimap<std::string, std::string>::iterator it = mmap.find(email);
-    if(it !=mmap.end())
+    for(auto email:emails)
     {
-        for(unsigned int i = 0; i < mmap.count(email); ++i){
-            std::cout<<it->second<<std::endl;
-            ++it;
+        std::multimap<std::string, std::string>::iterator it = mmap.find(email);
+        if(it !=mmap.end())
+        {   std::cout << "--- " << email << " ---"<< std::endl;
+            for(unsigned int i = 0; i < mmap.count(email); ++i){
+                std::cout<<it->second<<std::endl;
+                ++it;
+            }
+            std::cout<< "-----------" << std::endl;
         }
     }
-
-    std::cout<<"time total:" << end.tv_sec-start.tv_sec<<"s,"<<end.tv_usec-start.tv_usec<<"us"<<std::endl;
 
     for(auto email_p : emails_lkey)
         delete email_p;
