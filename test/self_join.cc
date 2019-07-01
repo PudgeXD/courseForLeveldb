@@ -227,14 +227,14 @@ leveldb::Status EntryFilter(std::string &db_name,
                 std::string key = ikey.user_key.ToString();
                 std::string value = iter_start->value().ToString();
                 int key_int = std::atoi(key.c_str());
-                if(key_int>=lower&&key_int<=upper)
-                {
+//                if(key_int>=lower&&key_int<=upper)
+//                {
                     for(auto email_lky:emails)
                     {
                         if(value.compare(email_lky->user_key().ToString())==0)
                             mmap.insert(std::make_pair(value,key));
                     }
-                }
+//                }
             }
             iter_start->Next();
             if(stop)
@@ -296,6 +296,19 @@ leveldb::Status EntryFilter(std::string &db_name,
     return leveldb::Status::OK();
 }
 
+void PrintJoinResult(std::string email, std::multimap<std::string,std::string>& mmap)
+{
+  std::multimap<std::string, std::string>::iterator it = mmap.find(email);
+  if(it !=mmap.end())
+  {   std::cout << "--- " << email << " ---"<< std::endl;
+    for(unsigned int i = 0; i < mmap.count(email); ++i){
+      std::cout<<it->second<<std::endl;
+      ++it;
+    }
+    std::cout<< "-----------" << std::endl;
+  }
+}
+
 int main()
 {
     timeval start, end;
@@ -313,8 +326,8 @@ int main()
     assert(status.ok());
 //    PrintTablesRange(db);
 
-    int lower = 1;
-    int upper = 500000;
+    int lower = 22028;
+    int upper = 45768;
     std::string mails_str = "XZS@ecnu.cn,MVN@ecnu.cn";
     //用set去重
     std::set<std::string> emails;
