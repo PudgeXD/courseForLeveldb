@@ -214,13 +214,10 @@ leveldb::Status EntryFilter(std::string &db_name,
                 std::string key = ikey.user_key.ToString();
                 std::string value = iter_start->value().ToString();
                 int key_int = std::atoi(key.c_str());
-                if(key_int>=lower&&key_int<=upper)
+                for(auto email:emails)
                 {
-                    for(auto email:emails)
-                    {
-                        if(value==email)
-                            mmap.insert(std::make_pair(value,key));
-                    }
+                    if(value==email)
+                        mmap.insert(std::make_pair(value,key));
                 }
             }
             iter_start->Next();
