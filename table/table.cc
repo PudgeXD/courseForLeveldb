@@ -35,12 +35,6 @@ struct Table::Rep {
   Block* index_block;
 };
 
-bool Table::KeyMayMatch(Slice key)
-{
-  FilterBlockReader* filter = rep_->filter;
-  return filter->TraversalKeyMayMatch(key);
-}
-
 Status Table::Open(const Options& options,
                    RandomAccessFile* file,
                    uint64_t size,
@@ -222,6 +216,25 @@ Iterator* Table::NewIterator(const ReadOptions& options) const {
   return NewTwoLevelIterator(
       rep_->index_block->NewIterator(rep_->options.comparator),
       &Table::BlockReader, const_cast<Table*>(this), options);
+}
+
+bool Table::TraversalValueMayMatch(Slice& value) {
+  FilterBlockReader* filter = rep_->filter;
+  Iterator* iiter = rep_->index_block->NewIterator(rep_->options.comparator);
+  iiter->SeekToFirst();
+  while(iiter->Valid()) {
+    Slice handle_value = iiter->value();
+    BlockHandle handle;
+    leveldb::Status s = handle.DecodeFrom(&handle_value);
+    assert(s.ok());
+    if(!filter->KeyMayMatch(handle.offset(),value)) {
+      //Not found
+      iiter->Next();
+    } else {
+      return true;
+    }
+  }
+      return false;
 }
 
 Status Table::InternalGet(const ReadOptions& options, const Slice& k,

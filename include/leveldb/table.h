@@ -44,7 +44,7 @@ class LEVELDB_EXPORT Table {
   Table(const Table&) = delete;
   void operator=(const Table&) = delete;
 
-  bool KeyMayMatch(Slice key);
+  bool TraversalValueMayMatch(Slice &value);
   ~Table();
 
   // Returns a new iterator over the table contents.

@@ -110,20 +110,4 @@ bool FilterBlockReader::KeyMayMatch(uint64_t block_offset, const Slice& key) {
   }
   return true;  // Errors are treated as potential matches
 }
-//遍历所有filter block寻找key
-bool FilterBlockReader::TraversalKeyMayMatch(const leveldb::Slice &key) {
-    for(uint64_t index=0;index<num_;index++)
-    {
-        uint32_t start = DecodeFixed32(offset_ + index*4);
-        uint32_t limit = DecodeFixed32(offset_ + index*4 + 4);
-        bool result = false;
-        if (start <= limit && limit <= static_cast<size_t>(offset_ - data_)) {
-            Slice filter = Slice(data_ + start, limit - start);
-            result = policy_->KeyMayMatch(key, filter);
-        }
-        if(result)
-            return result;
-    }
-    return false;
-}
 }

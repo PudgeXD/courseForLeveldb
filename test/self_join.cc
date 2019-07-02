@@ -107,25 +107,11 @@ leveldb::Status PrintTablesRange(leveldb::DB *db)
     }
 }
 
-leveldb::Status GetLookupKey(std::set<std::string>input,
-                                std::vector<leveldb::LookupKey*>&result,
-                                leveldb::SequenceNumber number)
-{
-    if(input.empty())
-        return leveldb::Status::EmptyInput("");
-    for(auto mail:input)
-    {
-        leveldb::LookupKey* lky_p = new leveldb::LookupKey(mail, number);
-        result.emplace_back(lky_p);
-    }
-    return leveldb::Status::OK();
-}
-
 leveldb::Status TableFilter(
         leveldb::DB *db, std::string &db_name,
         leveldb::Options options,
         int lower, int upper,
-        std::vector<leveldb::LookupKey*>&emails_lk,
+        std::set<std::string>&emails,
         std::vector<leveldb::FileMetaData*>& FileMetaDatas)
 {
     if(upper<lower)
@@ -143,7 +129,7 @@ leveldb::Status TableFilter(
                 if(!Intersect(lower,upper,id_min,id_max))
                     continue;
                 // email filter
-                if(emails_lk.empty())
+                if(emails.empty())
                 {
                     FileMetaDatas.emplace_back(f);
                     std::cout<<"warning:no emails filter input" <<std::endl;
@@ -157,12 +143,14 @@ leveldb::Status TableFilter(
                     assert(status.ok());
                     status = leveldb::Table::Open(options, file, f->file_size, &table);
                     assert(status.ok());
-                    //需要构造成internal_key
-                    for(auto lk:emails_lk)
+                    // value插入bloom filter时是user_key的形式而不是internal_key
+                    for(auto email:emails)
                     {
-                        if(table->KeyMayMatch(lk->internal_key()))
+                        leveldb::Slice ukey = leveldb::Slice(email);
+                        if(table->TraversalValueMayMatch(ukey))
                         {
                             FileMetaDatas.emplace_back(f);
+//                            std::cout << id_min << "," << id_max << std::endl;
                             break;
                         }
                     }
@@ -177,7 +165,7 @@ leveldb::Status EntryFilter(std::string &db_name,
                             leveldb::Options options,
                             int lower, int upper,
                             leveldb::SequenceNumber snapshot,
-                            std::vector<leveldb::LookupKey*>emails,
+                            std::set<std::string>emails,
                             std::vector<leveldb::FileMetaData*>fileMetaDatas,
                             std::multimap<std::string,std::string> &mmap)
 {
@@ -199,7 +187,6 @@ leveldb::Status EntryFilter(std::string &db_name,
         //Warning:注意判断key已删除和重复的情况
         leveldb::Iterator *iter_start = table->NewIterator(leveldb::ReadOptions());
         leveldb::Iterator *iter_end = table->NewIterator(leveldb::ReadOptions());
-        //TODO:确定起点和终点而不是全部遍历
         //TODO:没考虑历史数据的情况
         int min_id = atoi(target_file->smallest.user_key().ToString().c_str());
         int max_id = atoi(target_file->largest.user_key().ToString().c_str());
@@ -229,9 +216,9 @@ leveldb::Status EntryFilter(std::string &db_name,
                 int key_int = std::atoi(key.c_str());
                 if(key_int>=lower&&key_int<=upper)
                 {
-                    for(auto email_lky:emails)
+                    for(auto email:emails)
                     {
-                        if(value.compare(email_lky->user_key().ToString())==0)
+                        if(value==email)
                             mmap.insert(std::make_pair(value,key));
                     }
                 }
@@ -248,53 +235,53 @@ leveldb::Status EntryFilter(std::string &db_name,
     return leveldb::Status::OK();
 }
 
-// 扫描表时会扫描所有的entry
-leveldb::Status EntryFilter(std::string &db_name,
-                        leveldb::Options options,
-                        int lower, int upper,
-                        std::vector<leveldb::LookupKey*>emails,
-                        std::vector<leveldb::FileMetaData*>fileMetaDatas,
-                        std::multimap<std::string,std::string> &mmap)
-{
-    if(fileMetaDatas.empty())
-    {
-        std::string range = std::to_string(lower)+"-"+std::to_string(upper);
-        return leveldb::Status::NoTableHit(range);
-    }
-    for(auto target_file:fileMetaDatas)
-    {
-        leveldb::Status status;
-        leveldb::RandomAccessFile *file = nullptr;
-        leveldb::Table *table;
-        status = options.env->NewRandomAccessFile(leveldb::TableFileName(db_name, target_file->number), &file);
-        assert(status.ok());
-        status = leveldb::Table::Open(options, file, target_file->file_size, &table);
-        assert(status.ok());
-        //读取符合条件的entry压入mmp
-        //Warning:注意判断key已删除和重复的情况
-        leveldb::Iterator *table_iter = table->NewIterator(leveldb::ReadOptions());
-        table_iter->SeekToFirst();
-        while (table_iter->Valid()) {
-            leveldb::ParsedInternalKey ikey;
-            leveldb::ParseInternalKey(table_iter->key(), &ikey);
-            if(ikey.type!=leveldb::kTypeDeletion){
-                std::string key = ikey.user_key.ToString();
-                std::string value = table_iter->value().ToString();
-                int key_int = std::atoi(key.c_str());
-                if(key_int>=lower&&key_int<=upper)
-                {
-                    for(auto email_lky:emails)
-                    {
-                        if(value.compare(email_lky->user_key().ToString())==0)
-                            mmap.insert(std::make_pair(value,key));
-                    }
-                }
-            }
-            table_iter->Next();
-        }
-    }
-    return leveldb::Status::OK();
-}
+//扫描表时会扫描所有的entry
+//leveldb::Status EntryFilter(std::string &db_name,
+//                        leveldb::Options options,
+//                        int lower, int upper,
+//                        std::set<std::string>emails,
+//                        std::vector<leveldb::FileMetaData*>fileMetaDatas,
+//                        std::multimap<std::string,std::string> &mmap)
+//{
+//    if(fileMetaDatas.empty())
+//    {
+//        std::string range = std::to_string(lower)+"-"+std::to_string(upper);
+//        return leveldb::Status::NoTableHit(range);
+//    }
+//    for(auto target_file:fileMetaDatas)
+//    {
+//        leveldb::Status status;
+//        leveldb::RandomAccessFile *file = nullptr;
+//        leveldb::Table *table;
+//        status = options.env->NewRandomAccessFile(leveldb::TableFileName(db_name, target_file->number), &file);
+//        assert(status.ok());
+//        status = leveldb::Table::Open(options, file, target_file->file_size, &table);
+//        assert(status.ok());
+//        //读取符合条件的entry压入mmp
+//        //Warning:没有考虑重复的情况
+//        leveldb::Iterator *table_iter = table->NewIterator(leveldb::ReadOptions());
+//        table_iter->SeekToFirst();
+//        while (table_iter->Valid()) {
+//            leveldb::ParsedInternalKey ikey;
+//            leveldb::ParseInternalKey(table_iter->key(), &ikey);
+//            if(ikey.type!=leveldb::kTypeDeletion){
+//                std::string key = ikey.user_key.ToString();
+//                std::string value = table_iter->value().ToString();
+//                int key_int = std::atoi(key.c_str());
+//                if(key_int>=lower&&key_int<=upper)
+//                {
+//                    for(auto email:emails)
+//                    {
+//                        if(value==email)
+//                            mmap.insert(std::make_pair(value,key));
+//                    }
+//                }
+//            }
+//            table_iter->Next();
+//        }
+//    }
+//    return leveldb::Status::OK();
+//}
 
 int main()
 {
@@ -315,26 +302,23 @@ int main()
 
     int lower = 1;
     int upper = 500000;
-    std::string mails_str = "XZS@ecnu.cn,MVN@ecnu.cn";
+
+    std::string mails_str = "RKT@ecnu.cn";
     //用set去重
     std::set<std::string> emails;
     SplitString(mails_str,emails,",");
-    std::vector<leveldb::LookupKey*> emails_lkey;
     leveldb::SequenceNumber snapshot = db->GetLastSequenceNumber();
-    status = GetLookupKey(emails, emails_lkey, snapshot);
     assert(status.ok());
 
     std::vector<leveldb::FileMetaData*> fileMetaDatas;
     gettimeofday(&start, nullptr);
-    status = TableFilter(db,db_name,options,lower,upper,emails_lkey,fileMetaDatas);
+    status = TableFilter(db,db_name,options,lower,upper,emails,fileMetaDatas);
     assert(status.ok());
     std::cout << "table hit:" << fileMetaDatas.size() << std::endl;
 
     std::multimap<std::string,std::string> mmap;
-    status = EntryFilter(db_name,options,lower,upper, snapshot,emails_lkey,fileMetaDatas,mmap);
+    status = EntryFilter(db_name,options,lower,upper, snapshot,emails,fileMetaDatas,mmap);
     assert(status.ok());
-    gettimeofday(&end, nullptr);
-    std::cout<<"time total:" << end.tv_sec-start.tv_sec<<"s,"<<end.tv_usec-start.tv_usec<<"us"<<std::endl;
 
     for(auto email:emails)
     {
@@ -348,9 +332,10 @@ int main()
             std::cout<< "-----------" << std::endl;
         }
     }
+    gettimeofday(&end, nullptr);
 
-    for(auto email_p : emails_lkey)
-        delete email_p;
+    std::cout<<"time total:" << end.tv_sec-start.tv_sec<<"s,"<<end.tv_usec-start.tv_usec<<"us"<<std::endl;
+
     delete db;
 }
 
